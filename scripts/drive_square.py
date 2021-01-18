@@ -7,38 +7,58 @@ from geometry_msgs.msg import Vector3
 import time
 import math
 
+
+speed = 0.5
+forward_time = 5.0
+
+
 class DriveInSquare(object):
 	""" Description """
 	def __init__(self):
 		rospy.init_node("drive_square")
-		#rospy.Subscriber("/time", float, time)
 		self.twist_pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 10)
 		r = rospy.Rate(2)
 		lin = Vector3()
 		ang = Vector3()
 		self.twist = Twist(linear=lin, angular = ang)
 		print(self.twist)
+	def ramp_up(self, end):
+		s = 0.0
+		while s < end:
+			s = round(s+0.1, 1)
+			print("speed:", s)
+			self.twist.linear.x = s
+			self.twist_pub.publish(self.twist)
+			time.sleep(0.5)
+	def ramp_down(self, start):
+		s = start
+		while s > 0.0:
+			s = round(s-0.1, 1)
+			print("speed:", s)
+			self.twist.linear.x = s
+			self.twist_pub.publish(self.twist)
+			time.sleep(1.0)
+
 	def run(self):
 		print("running")
 		while not rospy.is_shutdown():
-			self.twist.linear.x = 0.1
-			self.twist_pub.publish(self.twist)
-			print(self.twist)
-			print("sleeping for 5")
-			time.sleep(5.0)
-
-			self.twist.linear.x = 0.0
-			self.twist_pub.publish(self.twist)
+			## robot accelerates to speed in 0.1 m/s increments
+			self.ramp_up(speed)
+			#robot maintains speed for forward_time s
+			time.sleep(forward_time)
+			## robot decelerates from speed to 0 in 0.1 m/s increments
+			self.ramp_down(speed)
+			## robot stops for 1s before completing twist (to avoid drift)
+			time.sleep(1.0)
+			## robot turns 90 deg = pi/2 radians
 			self.twist.angular.z = 0.5
 			self.twist_pub.publish(self.twist)
-			print(self.twist)
-			print("sleeping for pi")
 			time.sleep(math.pi)
-
+			## robot stops turning, again pausing to avoid drift
 			self.twist.angular.z = 0.0
 			self.twist_pub.publish(self.twist)
-			print(self.twist)
-			print('successfully turned')
+			time.sleep(1.0)
+
 		#rospy.spin()
 
 if __name__ == "__main__":

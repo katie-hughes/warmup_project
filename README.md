@@ -13,6 +13,6 @@ Then, I make the turn by setting the x velocity to 0 and setting the angular vel
 I was unsure if the robot was supposed to drive in a square once, then stop, or if it was supposed to be continuous. My program at the moment does continuous squares. There is some drift that becomes more and more noticeable with each square the robot completes. 
 
 
-Below is a gif of the square path: 
+Below is a gif of the square path the robot takes. Note that there is still some drifting, as the robot doesn't exactly end up at the origin. This comes from the slight drifting when it turns the corners. 
 
 ![Driving in a square](DriveInSquare2.gif)

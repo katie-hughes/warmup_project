@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+
 import rospy
 
 from geometry_msgs.msg import Twist
@@ -8,39 +10,41 @@ import time
 import math
 
 
-speed = 0.5
-forward_time = 5.0
+speed = 0.5             ## the robot's top speed
+forward_time = 5.0      ## how long the robot maintains top speed
 
 
 class DriveInSquare(object):
-	""" Description """
+	""" This node repeatedly drives the robot in a square """
 	def __init__(self):
+		## initializes the node and sets up for publishing to cmd_vel 
+		## (which will change robot's angular and linear velocity)
 		rospy.init_node("drive_square")
 		self.twist_pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 10)
 		r = rospy.Rate(2)
 		lin = Vector3()
 		ang = Vector3()
-		self.twist = Twist(linear=lin, angular = ang)
-		print(self.twist)
+		self.twist = Twist(linear=lin, angular = ang)  ## initially stationary
 	def ramp_up(self, end):
+		## accelerates robot from stationary to speed 'end', pausing every 0.5s. 
 		s = 0.0
 		while s < end:
 			s = round(s+0.1, 1)
-			print("speed:", s)
+			#print("speed:", s)
 			self.twist.linear.x = s
 			self.twist_pub.publish(self.twist)
 			time.sleep(0.5)
 	def ramp_down(self, start):
+		## deccelerates robot from speed 'start' to stationary, pausing every 1s.
 		s = start
 		while s > 0.0:
 			s = round(s-0.1, 1)
-			print("speed:", s)
+			#print("speed:", s)
 			self.twist.linear.x = s
 			self.twist_pub.publish(self.twist)
 			time.sleep(1.0)
 
 	def run(self):
-		print("running")
 		while not rospy.is_shutdown():
 			## robot accelerates to speed in 0.1 m/s increments
 			self.ramp_up(speed)
@@ -59,7 +63,6 @@ class DriveInSquare(object):
 			self.twist_pub.publish(self.twist)
 			time.sleep(1.0)
 
-		#rospy.spin()
 
 if __name__ == "__main__":
 	node = DriveInSquare()

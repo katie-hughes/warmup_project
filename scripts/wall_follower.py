@@ -10,8 +10,8 @@ import math
 
 
 angles = np.arange(360)
-dist = 0.4
-buffer = 0.2
+dist = 0.3
+buffer = 0.15
 delta = 10
 
 class FollowWall(object):
@@ -21,7 +21,7 @@ class FollowWall(object):
         rospy.Subscriber("/scan", LaserScan, self.process_scan)
         self.twist_pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 10)
         r = rospy.Rate(2)
-        lin = Vector3(x = 0.1)
+        lin = Vector3()
         ang = Vector3()
         self.twist = Twist(linear=lin, angular = ang)
     def process_scan(self, data):
@@ -45,15 +45,25 @@ class FollowWall(object):
         """
         if dist-buffer <= minimum_distance <= dist+buffer:
             print("The robot is the correct distance from the wall")
-            if 90-delta <= minimum_angle <= 90+delta:
+            if 270-delta <= minimum_angle <= 270+delta:
                 print("The robot is facing the right way")
                 self.twist.linear.x = 0.1
                 self.twist.angular.z = 0
                 self.twist_pub.publish(self.twist)
             else:
                 print("The robot needs to turn")
-                error1 = minimum_angle - 90
-                kp1 = 0.001
+                error1 = 0
+                if 90<=minimum_angle<=270:      ##turn right
+                    print("Turn right")
+                    error1 = minimum_angle - 270
+                else:
+                    print("Turn left")
+                    if minimum_angle > 0:
+                        error1 = minimum_angle - 270
+                    else:
+                        error1 = 90 + minimum_angle
+                kp1 = 0.01
+                print("ang velocity: ", error1)
                 self.twist.linear.x = 0
                 self.twist.angular.z = kp1*error1
                 self.twist_pub.publish(self.twist)
@@ -63,23 +73,26 @@ class FollowWall(object):
             if minimum_angle <= 10 or minimum_angle >= 350:
                 print("The robot is facing the appropriate wall")
                 error2 = minimum_distance - dist
-                kp2 = 0.01
+                kp2 = 1.0
                 self.twist.linear.x = kp2*error2
                 self.twist.angular.z = 0
                 self.twist_pub.publish(self.twist)
             else:
                 print("The robot needs to turn to face the appropriate wall")
                 error3 = 0
-                if minimum_angle <= 180:
+                if minimum_angle <= 180:    ## closest wall on the left
+                    print("closest wall is on the left")
                     error3 = minimum_angle
-                else:
-                    error3 = minimum_angle-360
-                kp3 = 0.001
+                else:                       ## closest wall on the right
+                    error3 = minimum_angle - 360
+                    print("closest wall is on the right")
+                kp3 = 0.01
                 print("error3 is", error3)
                 print("new angular velocity is", kp3*error3)
                 self.twist.linear.x = 0
                 self.twist.angular.z = kp3*error3
                 self.twist_pub.publish(self.twist)
+                ## i think this portion generally works.
 
     def run(self):
         rospy.spin()

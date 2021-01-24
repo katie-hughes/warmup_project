@@ -26,7 +26,6 @@ class FollowWall(object):
         ang = Vector3()
         self.twist = Twist(linear=lin, angular = ang)
     def process_scan(self, data):
-        ## len of data.ranges is 360
         print()
         minimum_angle = np.argmin(np.array(data.ranges))
         minimum_distance = data.ranges[minimum_angle]
@@ -38,7 +37,7 @@ class FollowWall(object):
             if 270-delta <= minimum_angle <= 270+delta:
                 print("The robot is facing the right way")
                 error4 = minimum_angle - 270
-                kp4 = 0.01
+                kp4 = 0.005
                 self.twist.linear.x = speed
                 self.twist.angular.z = error4*kp4
                 self.twist_pub.publish(self.twist)
@@ -46,10 +45,10 @@ class FollowWall(object):
                 print("The robot needs to turn")
                 error1 = 0
                 if 90<=minimum_angle<=270:
-                    print("Turn right")
+                    print("Turn Left (+))")
                     error1 = minimum_angle - 270
                 else:
-                    print("Turn left")
+                    print("Turn Right (-)")
                     if minimum_angle > 0:
                         error1 = minimum_angle - 270
                     else:
@@ -81,22 +80,15 @@ class FollowWall(object):
         else:
             print("The robot is too close")
             ##robot needs to turn away from the wall
-            self.twist.angular.z = 0.1
-            self.twist.linear.x = 0.1
-            self.twist_pub.publish(self.twist)
-            """
-            if minimum_angle < 300:
-                print("Robot needs to trun away from the wall ")
-                error5 = 300 - minimum_angle
-                kp5 = 0.01
+            if front_distance < dist:
+                print("Robot is about to hit a wall")
                 self.twist.linear.x = 0
-                self.twist.angular.z = error5*kp5
+                self.twist.angular.z = 0.5
                 self.twist_pub.publish(self.twist)
             else:
+                self.twist.angular.z = 0.1
                 self.twist.linear.x = speed
-                self.twist.angular.z = 0
                 self.twist_pub.publish(self.twist)
-            """
 
 
     def run(self):

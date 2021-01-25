@@ -1,7 +1,7 @@
 # warmup_project
 
 
-## DRIVE IN SQUARE: 
+## Drive in Square 
 I am using an approach with python's built in time module, specifically the sleep() function. Essentially, my robot travels forward for some set amount of time and then turns.  
 
 The init function sets up publishing to "cmd_vel" which is in charge of moving the robot forward and turning it. The "run" function executes the steps below. To run the code, I run "init" and then "run". 
@@ -12,9 +12,16 @@ Once the robot has reached its top speed, it continues at that speed for 5 sec. 
 
 Then, I make the turn by setting the x velocity to 0 and setting the angular velocity to 0.2 (rad/sec). I need to turn 90 degrees, or /pi/2 radians, so if I am turning at 0.2 rad/sec, I need to wait for /pi seconds until I have reached a right angle. Then I set the angular velocity to 0 and the process repeats, and the robot keeps driving in a square.
 
-I was unsure if the robot was supposed to drive in a square once, then stop, or if it was supposed to be continuous. My program at the moment does continuous squares. There is some drift that becomes more and more noticeable with each square the robot completes. 
-
-
-Below is a gif of the square path the robot takes. Note that there is still some drifting, as the robot doesn't exactly end up at the origin. This comes from the slight drifting when it turns the corners. 
+I was unsure if the robot was supposed to drive in a square once, then stop, or if it was supposed to be continuous. My program at the moment does continuous squares. There is some drift that becomes more and more noticeable with each square the robot completes. Below is a gif of the square path the robot takes. Note that there is still some drifting, as the robot doesn't exactly end up at the origin.
 
 ![Driving in a square](DriveInSquare2.gif)
+
+
+
+## Wall Follower
+
+![Following wall](wallfollower.gif)
+
+## Person Follower
+![Following person (cylinder)](personfollower.gif)
+

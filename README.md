@@ -24,6 +24,10 @@ The instructions for the robot are held in the FollowWall class. In "init", I su
 ![Following wall](wallfollower.gif)
 
 ## Person Follower
+My person follower code uses a very similar approach to my wall follower code. Essentially the robot uses its sensor to locate the object closest to it. Then it rotates towards the object, and once it is roughly facing it, it moves forward and stops a fixed distance away. 
+
+I describe these behaviors in my FollowPerson class. Again, in "init", I subscribe to "/scan" which gives me the sensor data, and set up a publisher to "/cmd_vel" so that I can move the robot. I again have a generic "change_velocity" helper function which takes in a linear and angular velocity and applies this to the "cmd_vel" publisher. My "process_scan" function first finds the closest object to the robot and its relative angle. If a minimum distance can't be found, the robot doesn't move. If the minimum distance is greater than the distance I want my robot to be from the object, I frist rotate the robot so that it is roughly facing the object and then move it forward. I again use proportional control for both the linear and angular components of the robot's velocity, which are proportional to the distance the robot is from the object and the angular offset, respectively. Finally, once the robot is the appropriate distance away, it stops. I try to run through each of these conditions in the gif below. 
+
 ![Following person (cylinder)](personfollower.gif)
 
 ## Challenges
